@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leksvin - Complete Car Care</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        neu: {
+                            base: '#ebecf0',
+                            light: '#ffffff',
+                            dark: '#babecc',
+                            text: '#4d5565', // Dark grey for text
+                            accent: '#d77a49', // Orange/Bronze from logo screenshot
+                        }
+                    },
+                    boxShadow: {
+                        'neu-flat': '5px 5px 10px #babecc, -5px -5px 10px #ffffff',
+                        'neu-pressed': 'inset 5px 5px 10px #babecc, inset -5px -5px 10px #ffffff',
+                        'neu-sm': '2px 2px 5px #babecc, -2px -2px 5px #ffffff',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #ebecf0;
+            color: #4d5565;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.4s ease-out forwards;
+        }
+
+        .slide-out-right {
+            animation: slideOutRight 0.4s ease-in forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes slideOutRight {
+            from { transform: translateX(0); }
+            to { transform: translateX(100%); }
+        }
+
+        /* Neumorphism Utilities */
+        .neu-card {
+            border-radius: 20px;
+            background: #ebecf0;
+            box-shadow: 5px 5px 10px #babecc, -5px -5px 10px #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .neu-btn {
+            border-radius: 50px;
+            background: #ebecf0;
+            box-shadow: 5px 5px 10px #babecc, -5px -5px 10px #ffffff;
+            color: #d77a49;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .neu-btn:active, .neu-btn.active {
+            box-shadow: inset 5px 5px 10px #babecc, inset -5px -5px 10px #ffffff;
+            transform: scale(0.98);
+        }
+
+        .neu-btn-secondary {
+            color: #4d5565;
+        }
+
+        .neu-input {
+            border-radius: 15px;
+            background: #ebecf0;
+            box-shadow: inset 5px 5px 10px #babecc, inset -5px -5px 10px #ffffff;
+            border: none;
+            outline: none;
+            width: 100%;
+            padding: 15px;
+            color: #4d5565;
+        }
+        
+        .neu-icon-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ebecf0;
+            box-shadow: 5px 5px 10px #babecc, -5px -5px 10px #ffffff;
+            color: #3b5998; /* Default social color */
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+        
+        .neu-icon-btn.insta { color: #C13584; }
+        .neu-icon-btn:active {
+             box-shadow: inset 5px 5px 10px #babecc, inset -5px -5px 10px #ffffff;
+        }
+
+        /* Glass blur effect for overlay */
+        .glass-blur {
+            backdrop-filter: blur(10px);
+            background-color: rgba(235, 236, 240, 0.7);
+        }
+
+        /* Loader */
+        .loader {
+            border: 4px solid #ebecf0;
+            border-radius: 50%;
+            border-top: 4px solid #d77a49;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Custom styles for the pill-shaped mobile nav (based on previous request) */
+        .navbar-neumorphism {
+            background-color: #dee6f2; /* Lighter blueish-grey from image */
+            box-shadow: 7px 7px 15px #b0b8c6, -7px -7px 15px #ffffff;
+            border-radius: 50px; /* Rounded pill shape */
+            padding: 10px 20px;
+        }
+
+        .navbar-neumorphism-item {
+            background-color: #dee6f2; /* Match parent background */
+            box-shadow: inset 3px 3px 7px #b0b8c6, inset -3px -3px 7px #ffffff;
+            border-radius: 50px;
+            color: #707070; /* Darker grey for text */
+            font-weight: 500;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-neumorphism-item:active {
+            box-shadow: inset 2px 2px 5px #b0b8c6, inset -2px -2px 5px #ffffff;
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-40 bg-neu-base/90 backdrop-blur-md transition-all duration-300 py-4" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                
+                <!-- Mobile Nav (Pill-shaped Neumorphic) -->
+                <div class="flex-grow flex justify-center md:hidden">
+                    <div class="navbar-neumorphism flex items-center justify-between w-full max-w-sm">
+                        <span class="text-neu-navtext text-xl font-semibold ml-4 text-gray-800">LEKSVIN</span>
+                        <button id="mobile-menu-btn" class="navbar-neumorphism-item w-10 h-10 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-bars text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Desktop Nav (Standard) -->
+                <div class="hidden md:flex flex-grow justify-between items-center">
+                    
+                    <!-- Logo (Desktop) -->
+                    <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="router.navigate('home')">
+                        <div class="flex items-center gap-1">
+                            <span class="text-3xl font-bold tracking-tighter text-gray-800">LE</span>
+                            <div class="w-8 h-8 rounded-lg bg-white shadow-neu-sm flex items-center justify-center mx-1">
+                                <i class="fa-solid fa-chevron-right text-neu-accent text-xl"></i>
+                            </div>
+                            <span class="text-3xl font-bold tracking-tighter text-gray-800">SVIN</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Links (Desktop) -->
+                    <div class="flex space-x-8">
+                        <a href="#" onclick="event.preventDefault(); router.navigate('home')" class="text-neu-text hover:text-neu-accent font-medium transition">Home</a>
+                        <a href="#" onclick="event.preventDefault(); router.navigate('products')" class="text-neu-text hover:text-neu-accent font-medium transition">Products</a>
+                        <a href="#" onclick="event.preventDefault(); router.navigate('about-us')" class="text-neu-text hover:text-neu-accent font-medium transition">About Us</a>
+                        <a href="#" onclick="event.preventDefault(); router.navigate('contact-us')" class="text-neu-text hover:text-neu-accent font-medium transition">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Slide-out Menu -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/20 z-50 hidden opacity-0 transition-opacity duration-300">
+        <div id="mobile-menu-panel" class="absolute top-0 right-0 w-3/4 max-w-xs h-full bg-neu-base shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col p-6">
+            <div class="flex justify-end mb-8">
+                <button id="close-menu-btn" class="neu-btn w-10 h-10 rounded-full flex items-center justify-center text-neu-text">
+                    <i class="fa-solid fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-6 items-center">
+                <button onclick="router.navigate('home'); toggleMobileMenu()" class="neu-btn w-full h-12 text-lg">Home</button>
+                <button onclick="router.navigate('products'); toggleMobileMenu()" class="neu-btn w-full h-12 text-lg">Products</button>
+                <button onclick="router.navigate('about-us'); toggleMobileMenu()" class="neu-btn w-full h-12 text-lg">About Us</button>
+                <button onclick="router.navigate('contact-us'); toggleMobileMenu()" class="neu-btn w-full h-12 text-lg">Contact Us</button>
+            </div>
+            
+            <div class="mt-auto text-center text-sm text-gray-400">
+                &copy; 2025 Leksvin
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main id="app" class="pt-20 min-h-screen">
+        <!-- Views will be injected here by JS -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-neu-base mt-12 py-10 border-t border-gray-200" id="main-footer">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center md:items-start space-y-8 md:space-y-0">
+                
+                <!-- Logo Section -->
+                <div class="flex flex-col items-center md:items-start">
+                    <div class="flex items-center gap-1 mb-4">
+                         <span class="text-2xl font-bold tracking-tighter text-gray-800">LE</span>
+                        <div class="w-6 h-6 rounded-md bg-white shadow-neu-sm flex items-center justify-center mx-1">
+                            <i class="fa-solid fa-chevron-right text-neu-accent text-sm"></i>
+                        </div>
+                        <span class="text-2xl font-bold tracking-tighter text-gray-800">SVIN</span>
+                    </div>
+                    <div class="flex space-x-4 mt-2">
+                        <a href="https://facebook.com" target="_blank" class="neu-icon-btn w-10 h-10 text-sm"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://instagram.com" target="_blank" class="neu-icon-btn insta w-10 h-10 text-sm"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+
+                <!-- Links -->
+                <div class="flex flex-col items-center md:items-start space-y-2">
+                    <h3 class="font-bold text-neu-text mb-2">Quick Links</h3>
+                    <a href="#" onclick="event.preventDefault(); router.navigate('products')" class="text-gray-500 hover:text-neu-accent transition">Products</a>
+                    <a href="#" onclick="event.preventDefault(); router.navigate('about-us')" class="text-gray-500 hover:text-neu-accent transition">About Us</a>
+                    <a href="#" onclick="event.preventDefault(); router.navigate('contact-us')" class="text-gray-500 hover:text-neu-accent transition">Contact Us</a>
+                </div>
+
+                <!-- Contact -->
+                <div class="flex flex-col items-center md:items-start text-center md:text-left space-y-2">
+                    <h3 class="font-bold text-neu-text mb-2">Contact</h3>
+                    <p class="text-gray-500 text-sm">Head Office: 6th Street, Ind. Area 15, Sharjah, UAE</p>
+                    <p class="text-gray-500 text-sm">Store: 10th Street, Ind. Area 15, Sharjah, UAE</p>
+                    <p class="text-neu-accent font-semibold mt-2">+971 65348008</p>
+                    <p class="text-gray-500 text-sm">mail@leksvin.com</p>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-8 border-t border-gray-300 text-center">
+                <p class="text-gray-400 text-sm">Copyright 2025 Leksvin</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Details Modal (Hidden by default) -->
+    <div id="product-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 glass-blur" onclick="closeProductModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="neu-card w-full max-w-2xl bg-neu-base p-6 relative overflow-y-auto max-h-[90vh] fade-in">
+                <button onclick="closeProductModal()" class="absolute top-4 right-4 neu-btn w-10 h-10 rounded-full text-gray-500">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+                <div class="flex flex-col md:flex-row gap-6 mt-4">
+                    <div class="w-full md:w-1/2">
+                        <div class="neu-card p-4 flex items-center justify-center h-64 relative">
+                            <i id="modal-icon" class="fa-solid fa-box-open text-6xl text-gray-300 absolute"></i>
+                            <img id="modal-img" src="" alt="" class="w-full h-full object-contain rounded-lg z-10 relative hidden">
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2 flex flex-col justify-center">
+                        <h2 id="modal-title" class="text-2xl font-bold text-gray-800 mb-2">Product Name</h2>
+                        <h3 id="modal-price" class="text-xl text-neu-accent font-bold mb-4">$29.99</h3>
+                        <p id="modal-desc" class="text-gray-500 leading-relaxed mb-6">
+                            Detailed description goes here.
+                        </p>
+                        <button class="neu-btn w-full py-3">Add to Inquiry</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Data ---
+
+        const brandLogos = [
+            {
+                name: "3M",
+                src: "images/brands/3m.svg",
+                alt: "3M"
+            },
+            {
+                name: "Menzerna",
+                src: "images/brands/menzerna.webp",
+                alt: "Menzerna"
+            },
+            {
+                name: "Luminous",
+                src: "images/brands/luminous.png",
+                alt: "Luminous"
+            },
+            {
+                name: "Rupes",
+                src: "images/brands/rupes.png",
+                alt: "Rupes"
+            },
+            {
+                name: "Basf",
+                src: "images/brands/basf.jpg",
+                alt: "BASF"
+            },
+            {
+                name: "Ecolab",
+                src: "images/brands/ecolab.svg",
+                alt: "Ecolab"
+            },
+            {
+                name: "Shine Mate",
+                src: "images/brands/shinemate.svg",
+                alt: "Shine Mate"
+            },
+            {
+                name: "Nasiol",
+                src: "images/brands/nasiol.png",
+                alt: "Nasiol"
+            },
+            {
+                name: "Meguiars",
+                src: "images/brands/meguiars.webp",
+                alt: "Meguiars"
+            },
+            {
+                name: "Jade",
+                src: "images/brands/jade.png",
+                alt: "Jade"
+            },
+            {
+                name: "Henkel",
+                src: "images/brands/henkel.svg",
+                alt: "Henkel"
+            },
+            {
+                name: "Puris",
+                src: "images/brands/puris.webp",
+                alt: "Puris"
+            },
+            {
+                name: "Reckitt",
+                src: "images/brands/reckitt.svg",
+                alt: "Reckitt"
+            },
+            {
+                name: "Wavex",
+                src: "images/brands/wavex.png",
+                alt: "Wavex"
+            },
+            {
+                name: "Kochchemie",
+                src: "images/brands/kochchemie.png",
+                alt: "Kochchemie"
+            },
+            {
+                name: "Adams Polishes",
+                src: "images/brands/adams_polishes.png",
+                alt: "Adams Polishes"
+            },
+        ];
+
+
+        const productCategories = [
+            { id: 'cleaning-detailing', name: "Cleaning & Detailing Essentials", image: "images/product-category/cleaning_and_detailing.jpg" },
+            { id: 'interior-exterior', name: "Interior & Exterior Care Products", image: "93162.jpg" },
+            { id: 'protective-coatings', name: "Protective Coatings & Waxes", image: "93178.jpg" },
+            { id: 'maintenance', name: "Professional-Grade Maintenance", image: "93153.jpg" },
+            { id: 'industrial', name: "Industrial Cleaners", image: "93169.jpg" },
+            { id: 'carwash', name: "Car Wash & Car Care", image: "93167.jpg" },
+            { id: 'workshop', name: "Workshop Cleaners", image: "66921.png" },
+            { id: 'decontamination', name: "Decontamination Chemicals", image: "93173.jpg" },
+            { id: 'heavy-duty', name: "Heavy Duty Cleaning Compounds", image: "93160.jpg" },
+            { id: 'electrical', name: "Electrical Contact Cleaners", image: "93171.jpg" },
+            { id: 'ev-fluids', name: "EV Fluids", image: "93174.jpg" },
+            { id: 'floor', name: "Floor Cleaners", image: "93162.jpg" },
+            { id: 'home-care', name: "Home Care Chemicals", image: "93178.jpg" },
+            { id: 'marine', name: "Marine Cleaners", image: "93153.jpg" },
+        ];
+
+        // The keys of this object must match the ids you defined in your productCategories array (e.g., 'cleaning-detailing', 'interior-exterior').
+        const productsData = {
+            'cleaning-detailing': [
+                {
+                    id: 1,
+                    name: "Premium Microfiber Towel",
+                    price: "$12.00",
+                    desc: "Ultra-soft 800GSM microfiber towel, perfect for buffing and drying without scratches.",
+                    image: "images/products/microfiber-towel.jpg" 
+                },
+                {
+                    id: 2,
+                    name: "Citrus Pre-Wash",
+                    price: "$25.50",
+                    desc: "Powerful citrus-based cleaner to remove road grime and bug splatters before contact washing.",
+                    image: "images/products/citrus-wash.jpg"
+                },
+                // Add more products for this category here...
+            ],
+            'interior-exterior': [
+                {
+                    id: 101,
+                    name: "Leather Conditioner",
+                    price: "$30.00",
+                    desc: "Restores natural look and feel to leather seats while protecting against UV rays.",
+                    image: "images/products/leather-cond.jpg"
+                },
+                // Add more products for this category here...
+            ],
+            // Repeat for all other category IDs: 'protective-coatings', 'maintenance', etc.
+        };
+
+        // --- Router & State ---
+        const router = {
+            currentRoute: 'home',
+            params: {},
+            
+            navigate(route, params = {}) {
+                this.currentRoute = route;
+                this.params = params;
+                window.scrollTo(0, 0);
+                render();
+            }
+        };
+
+        // --- DOM Elements ---
+        const app = document.getElementById('app');
+        const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+        const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+
+        // --- Navigation Logic ---
+        function toggleMobileMenu() {
+            const isHidden = mobileMenuOverlay.classList.contains('hidden');
+            if (isHidden) {
+                mobileMenuOverlay.classList.remove('hidden');
+                // Trigger reflow
+                void mobileMenuOverlay.offsetWidth;
+                mobileMenuOverlay.classList.remove('opacity-0');
+                mobileMenuPanel.classList.remove('translate-x-full');
+            } else {
+                mobileMenuPanel.classList.add('translate-x-full');
+                mobileMenuOverlay.classList.add('opacity-0');
+                setTimeout(() => {
+                    mobileMenuOverlay.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+        closeMenuBtn.addEventListener('click', toggleMobileMenu);
+        mobileMenuOverlay.addEventListener('click', (e) => {
+            if(e.target === mobileMenuOverlay) toggleMobileMenu();
+        });
+        
+        
+
+        // --- Views ---
+
+        function render() {
+            app.innerHTML = '';
+            
+            switch(router.currentRoute) {
+                case 'home':
+                    app.innerHTML = renderHome();
+                    animateHome();
+                    break;
+                case 'products':
+                    app.innerHTML = renderProductsCategories();
+                    break;
+                case 'category-products':
+                    app.innerHTML = renderCategoryProducts(router.params.id, router.params.name);
+                    break;
+                case 'about-us':
+                    app.innerHTML = renderAbout();
+                    break;
+                case 'contact-us':
+                    app.innerHTML = renderContact();
+                    break;
+                default:
+                    app.innerHTML = renderHome();
+            }
+        }
+
+        function renderHome() {
+            return `
+                <!-- Hero Section -->
+                <section class="max-w-7xl mx-auto px-4 py-12 md:py-24 text-center">
+                    <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-6 leading-tight fade-in" style="animation-delay: 0.1s">
+                        Your One-Stop Destination for <br><span class="text-neu-accent">Complete Car Care</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-500 mb-10 max-w-2xl mx-auto fade-in" style="animation-delay: 0.3s">
+                        Explore a complete range of multi-brand, world-class car care solutions — trusted by professionals and loved by car owners.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-6 justify-center fade-in" style="animation-delay: 0.5s">
+                        <button onclick="router.navigate('products')" class="neu-btn px-8 py-4 text-lg bg-neu-base hover:text-neu-accent">
+                            Explore Products
+                        </button>
+                        <button onclick="router.navigate('contact-us')" class="neu-btn neu-btn-secondary px-8 py-4 text-lg">
+                            Contact Us
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Categories Preview -->
+                <section class="py-16 bg-gray-100/50">
+                    <div class="max-w-7xl mx-auto px-4 text-center">
+                        <h2 class="text-3xl font-bold mb-12 text-gray-800">Browse our product categories</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+                            ${productCategories.slice(0, 6).map(cat => `
+                                <div onclick="router.navigate('category-products', {id: '${cat.id}', name: '${cat.name}'})" 
+                                     class="neu-card relative overflow-hidden h-64 cursor-pointer hover:scale-[1.02] transition-transform group">
+                                    <img src="${cat.image}" alt="${cat.name}" class="w-full h-full object-cover absolute inset-0 transition-transform duration-300 group-hover:scale-110">
+                                    <div class="absolute bottom-0 left-0 w-full bg-black/60 p-4 text-left">
+                                        <h3 class="font-bold text-lg text-white">${cat.name}</h3>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="router.navigate('products')" class="neu-btn px-8 py-3 text-sm">View More</button>
+                    </div>
+                </section>
+
+                <!-- Philosophy -->
+                <section class="py-20 max-w-5xl mx-auto px-4 text-center">
+                    <div class="neu-card p-8 md:p-12 relative overflow-hidden">
+                        <div class="absolute -top-10 -left-10 w-40 h-40 bg-white/30 rounded-full filter blur-xl"></div>
+                        <p class="text-lg md:text-xl text-gray-600 leading-relaxed mb-6 relative z-10">
+                            “At Leksvin, we believe car care should be simple, effective, and accessible. As a multi-brand hub, we bring together the finest car care products from trusted global brands — all under one roof. From cleaning and detailing to advanced maintenance and protection, our lineup is tailored for service professionals and car enthusiasts alike.”
+                        </p>
+                        <p class="text-2xl font-serif italic text-neu-accent relative z-10">
+                            "More than products. Complete solutions for your car."
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Brands (responsive grid) -->
+                <section class="py-16 bg-neu-base">
+                    <div class="max-w-7xl mx-auto px-4 text-center">
+                        <h2 class="text-3xl font-bold mb-8 text-gray-800">Brands We Represent</h2>
+
+                        <div class="neu-card p-8 md:p-12 mx-auto max-w-6xl">
+                            <!-- Mobile: 1, small tablet: 2, larger tablet: 3, large+ screens: max 4 -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-6 place-items-center">
+                                ${brandLogos.map(brand => `
+                                    <div class="w-full flex items-center justify-center">
+                                        <img
+                                            src="${brand.src}"
+                                            alt="${brand.alt}"
+                                            loading="lazy"
+                                            class="max-h-12 md:max-h-16 w-auto object-contain filter grayscale"
+                                        />
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+
+
+                <!-- Why Choose Us -->
+                <section class="py-20 max-w-7xl mx-auto px-4">
+                    <h2 class="text-3xl font-bold mb-2 text-center text-gray-800"><span class="border-b-4 border-neu-accent pb-1">Why Choose Us</span></h2>
+                    <p class="text-center text-gray-500 italic mb-12 mt-6">"With Leksvin, caring for your car is no longer a task — it’s a standard of excellence."</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Card 1 -->
+                        <div class="neu-card p-8 flex items-start space-x-4">
+                            <div class="w-12 h-12 flex-shrink-0 rounded-full bg-neu-base shadow-neu-sm flex items-center justify-center text-neu-accent">
+                                <i class="fa-solid fa-globe"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg mb-2">Premium Multi-Brand Lineup</h3>
+                                <p class="text-sm text-gray-500">Experience a world-class selection of car care products sourced from leading brands around the globe.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="neu-card p-8 flex items-start space-x-4">
+                            <div class="w-12 h-12 flex-shrink-0 rounded-full bg-neu-base shadow-neu-sm flex items-center justify-center text-neu-accent">
+                                <i class="fa-solid fa-thumbs-up"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg mb-2">Trusted by Experts & Enthusiasts</h3>
+                                <p class="text-sm text-gray-500">Our products are chosen and recommended by professionals and passionate car lovers alike.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="neu-card p-8 flex items-start space-x-4">
+                            <div class="w-12 h-12 flex-shrink-0 rounded-full bg-neu-base shadow-neu-sm flex items-center justify-center text-neu-accent">
+                                <i class="fa-solid fa-shield-alt"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg mb-2">Quality You Can Rely On</h3>
+                                <p class="text-sm text-gray-500">Every solution is rigorously tested to deliver consistent, reliable performance for your vehicle.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 4 -->
+                        <div class="neu-card p-8 flex items-start space-x-4">
+                            <div class="w-12 h-12 flex-shrink-0 rounded-full bg-neu-base shadow-neu-sm flex items-center justify-center text-neu-accent">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg mb-2">Comprehensive Car Care</h3>
+                                <p class="text-sm text-gray-500">Find everything you need — from cleaning to protection — under one roof for total convenience.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CTA Banner -->
+                <section class="py-16 text-center bg-gray-200/50">
+                    <div class="max-w-4xl mx-auto px-4">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-4">✨ Leksvin – Where Car Care Meets Excellence</h2>
+                        <p class="text-gray-600 mb-8">Upgrade your car care routine with trusted, professional-grade products.</p>
+                        <div class="flex flex-col gap-4 items-center justify-center">
+                            <button onclick="router.navigate('products')" class="neu-btn px-10 py-3 w-64">Browse Products</button>
+                            <button onclick="router.navigate('contact-us')" class="neu-btn neu-btn-secondary px-10 py-3 w-64">Contact Us</button>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderProductsCategories() {
+            return `
+                <div class="max-w-7xl mx-auto px-4 py-12 fade-in">
+                    <h1 class="text-3xl font-bold text-center mb-12">Browse Our Product Categories</h1>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        ${productCategories.map(cat => `
+                            <div onclick="router.navigate('category-products', {id: '${cat.id}', name: '${cat.name}'})" 
+                                 class="neu-card relative overflow-hidden h-72 cursor-pointer hover:scale-[1.02] transition-transform group">
+                                <img src="${cat.image}" alt="${cat.name}" class="w-full h-full object-cover absolute inset-0 transition-transform duration-300 group-hover:scale-110">
+                                <div class="absolute bottom-0 left-0 w-full bg-black/60 p-4 text-left">
+                                    <h3 class="font-bold text-lg text-white">${cat.name}</h3>
+                                    <p class="text-xs text-gray-300 mt-2">View Products <i class="fa-solid fa-arrow-right ml-1"></i></p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCategoryProducts(catId, catName) {
+            // 1. Fetch products from our manual database
+            // If the category is empty or undefined, default to an empty array
+            const allProducts = productsData[catId] || [];
+            
+            // 2. Determine how many to show initially
+            const itemsPerPage = 12;
+            const initialLoad = allProducts.slice(0, itemsPerPage);
+            const hasMore = allProducts.length > itemsPerPage;
+
+            // 3. Setup the Load More button logic
+            setTimeout(() => {
+                const loadBtn = document.getElementById('load-more-btn');
+                // Only show button if there are actually more products
+                if (loadBtn && hasMore) {
+                    loadBtn.addEventListener('click', function() {
+                        const grid = document.getElementById('products-grid');
+                        // Calculate next batch
+                        const currentCount = grid.children.length;
+                        const nextBatch = allProducts.slice(currentCount, currentCount + itemsPerPage);
+                        
+                        nextBatch.forEach(p => {
+                            const pEl = document.createElement('div');
+                            pEl.className = 'neu-card p-4 flex flex-col fade-in';
+                            pEl.innerHTML = getProductCardHTML(p);
+                            grid.appendChild(pEl);
+                        });
+                        
+                        // Hide button if we reached the end
+                        if (grid.children.length >= allProducts.length) {
+                            this.style.display = 'none';
+                        }
+                    });
+                } else if (loadBtn) {
+                    // Hide button immediately if no more products
+                    loadBtn.style.display = 'none';
+                }
+            }, 100);
+
+            // 4. Handle "No Products Found" scenario
+            let gridContent = '';
+            if (initialLoad.length === 0) {
+                gridContent = `<div class="col-span-full text-center py-10 text-gray-500">No products found in this category yet.</div>`;
+            } else {
+                gridContent = initialLoad.map(p => `
+                    <div class="neu-card p-4 flex flex-col fade-in">
+                        ${getProductCardHTML(p)}
+                    </div>
+                `).join('');
+            }
+
+            return `
+                <div class="max-w-7xl mx-auto px-4 py-12">
+                    <div class="flex items-center mb-8">
+                        <button onclick="router.navigate('products')" class="neu-btn w-10 h-10 rounded-full mr-4"><i class="fa-solid fa-arrow-left"></i></button>
+                        <h1 class="text-2xl md:text-3xl font-bold">Browse ${catName}</h1>
+                    </div>
+                    
+                    <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+                        ${gridContent}
+                    </div>
+
+                    <div class="flex justify-center">
+                        <button id="load-more-btn" class="neu-btn px-8 py-3" style="display: ${hasMore ? 'block' : 'none'}">Load More Products</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getProductCardHTML(product) {
+            // Check if product has an image property and if it is not empty
+            const hasImage = product.image && product.image.trim() !== "";
+            
+            return `
+                <div class="h-48 bg-gray-200 rounded-lg mb-4 flex items-center justify-center shadow-inner overflow-hidden relative">
+                    ${hasImage 
+                        ? `<img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">` 
+                        : `<i class="fa-solid fa-image text-4xl text-gray-400"></i>`
+                    }
+                </div>
+                <h3 class="font-bold text-gray-800 mb-1 truncate">${product.name}</h3>
+                <p class="text-xs text-gray-500 mb-2 line-clamp-2">${product.desc}</p>
+                <div class="mt-auto flex justify-between items-center">
+                    <span class="text-neu-accent font-bold">${product.price}</span>
+                    <button onclick="openProductModal('${product.name.replace(/'/g, "\\'")}', '${product.price}', '${product.desc.replace(/'/g, "\\'")}', '${product.image}')" class="neu-btn px-4 py-1 text-xs scale-90">Details</button>
+                </div>
+            `;
+        }
+
+        function renderAbout() {
+            return `
+                <div class="max-w-4xl mx-auto px-4 py-12 fade-in">
+                    <h1 class="text-4xl font-bold text-center mb-12 text-gray-800">About Leksvin</h1>
+                    
+                    <div class="neu-card p-6 md:p-10 mb-10">
+                        <p class="text-lg leading-relaxed text-gray-600 mb-6">
+                            Leksvin is your one-stop destination for complete car care solutions, bringing together everything you need under one roof. As a trusted multi-brand hub, we offer a carefully curated range of globally recognized products — from cleaning and detailing essentials to advanced maintenance and protective solutions — designed for car care professionals and passionate vehicle owners alike.
+                        </p>
+                        <p class="text-lg leading-relaxed text-gray-600">
+                             At Leksvin, we don’t just provide products; we deliver quality, variety, and reliable solutions that make caring for your vehicle effortless, effective, and confident.
+                        </p>
+                    </div>
+
+                    <div class="neu-card p-4 h-64 md:h-96 flex items-center justify-center relative overflow-hidden group">
+                        <!-- Placeholder for showroom image -->
+                        <div class="absolute inset-0 bg-gray-300 animate-pulse"></div>
+                        <i class="fa-solid fa-store text-6xl text-gray-400 z-10 relative"></i>
+                        <span class="z-10 relative mt-24 text-gray-500 font-semibold">Premium Showroom Image Placeholder</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderContact() {
+            return `
+                <div class="max-w-7xl mx-auto px-4 py-12 fade-in">
+                    <h1 class="text-4xl font-bold text-center mb-12 text-gray-800">Contact Us</h1>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <!-- Form -->
+                        <div class="space-y-6">
+                            <h2 class="text-xl font-bold mb-4 text-gray-700">Send us a message</h2>
+                            <form onsubmit="event.preventDefault(); alert('Message sent! (Simulation)');" class="space-y-5">
+                                <input type="text" placeholder="Your Name" class="neu-input" required>
+                                <input type="email" placeholder="Email Address" class="neu-input" required>
+                                <input type="tel" placeholder="Mobile Number" class="neu-input" required>
+                                <textarea rows="5" placeholder="Your Message" class="neu-input"></textarea>
+                                <button type="submit" class="neu-btn w-full py-3 text-lg">Submit</button>
+                            </form>
+                        </div>
+
+                        <!-- Info -->
+                        <div class="space-y-8">
+                             <div class="neu-card p-8">
+                                <h3 class="font-bold text-gray-700 mb-6 border-b border-gray-300 pb-2">We are also present here</h3>
+                                <div class="flex space-x-6">
+                                    <a href="#" class="neu-icon-btn w-12 h-12 text-blue-600"><i class="fab fa-facebook-f"></i></a>
+                                    <a href="#" class="neu-icon-btn w-12 h-12 text-pink-600"><i class="fab fa-instagram"></i></a>
+                                </div>
+                            </div>
+
+                            <div class="neu-card p-8">
+                                <h3 class="font-bold text-gray-700 mb-6 border-b border-gray-300 pb-2">Quick Contact</h3>
+                                <div class="space-y-4 text-gray-600">
+                                    <div class="flex items-start">
+                                        <i class="fa-solid fa-location-dot mt-1 mr-3 text-neu-accent"></i>
+                                        <div>
+                                            <span class="font-semibold block">Head Office</span>
+                                            <span class="text-sm">6th Street, Industrial Area 15, Sharjah, UAE</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fa-solid fa-store mt-1 mr-3 text-neu-accent"></i>
+                                        <div>
+                                            <span class="font-semibold block">Store</span>
+                                            <span class="text-sm">10th Street, Industrial Area 15, Sharjah, UAE</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fa-solid fa-phone mr-3 text-neu-accent"></i>
+                                        <span>+971 65348008</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fa-solid fa-envelope mr-3 text-neu-accent"></i>
+                                        <span>mail@leksvin.com</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function animateHome() {
+            // Helper to add 'active' classes or similar if needed logic arises
+        }
+
+        // --- Modal Logic ---
+        function openProductModal(title, price, desc, imageSrc) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-price').innerText = price;
+            document.getElementById('modal-desc').innerText = desc;
+
+            const imgEl = document.getElementById('modal-img');
+            const iconEl = document.getElementById('modal-icon');
+
+            if (imageSrc && imageSrc !== 'undefined' && imageSrc !== '') {
+                imgEl.src = imageSrc;
+                imgEl.classList.remove('hidden');
+                iconEl.classList.add('hidden');
+            } else {
+                imgEl.classList.add('hidden');
+                iconEl.classList.remove('hidden');
+            }
+
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        // --- Init ---
+        // Handle Back Button
+        window.onpopstate = () => {
+             // Simple fallback for history
+             render(); 
+        };
+
+        // Initial Render
+        render();
+
+    </script>
+</body>
+</html>
