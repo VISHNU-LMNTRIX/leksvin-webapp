@@ -750,10 +750,16 @@
         const router = {
             currentRoute: 'home',
             params: {},
-            
-            navigate(route, params = {}) {
+
+            navigate(route, params = {}, addToHistory = true) {
                 this.currentRoute = route;
                 this.params = params;
+                
+                // Push to history so the back button works
+                if (addToHistory) {
+                    window.history.pushState({ route, params }, null, `#${route}`);
+                }
+                
                 window.scrollTo(0, 0);
                 render();
             }
@@ -1215,9 +1221,14 @@
 
         // --- Init ---
         // Handle Back Button
-        window.onpopstate = () => {
-             // Simple fallback for history
-             render(); 
+        window.onpopstate = (event) => {
+            if (event.state) {
+                // If state exists, go to that route but DON'T add to history again
+                router.navigate(event.state.route, event.state.params, false);
+            } else {
+                // If no state exists (e.g., user is back at the start), go Home
+                router.navigate('home', {}, false);
+            }
         };
 
         // Initial Render
