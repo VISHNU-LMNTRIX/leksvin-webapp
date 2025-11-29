@@ -220,7 +220,7 @@
                         <a href="#" onclick="event.preventDefault(); router.navigate('home')" class="text-neu-text hover:text-neu-accent font-medium transition">Home</a>
                         <a href="#" onclick="event.preventDefault(); router.navigate('products')" class="text-neu-text hover:text-neu-accent font-medium transition">Products</a>
                         <a href="#" onclick="event.preventDefault(); router.navigate('about-us')" class="text-neu-text hover:text-neu-accent font-medium transition">About Us</a>
-                        <a href="#" onclick="event.preventDefault(); router.navigate('contact-us')" class="text-neu-text hover:text-neu-accent font-medium transition">Contact Us</a>
+                        <a href="#" onclick="event.preventDefault(); goToContact()" class="text-neu-text hover:text-neu-accent font-medium transition">Contact Us</a>
                     </div>
                 </div>
             </div>
@@ -239,7 +239,7 @@
                 <button onclick="router.navigate('home'); toggleMobileMenu()" class="neu-btn mobile-nav-btn w-full h-12 text-lg">Home</button>
                 <button onclick="router.navigate('products'); toggleMobileMenu()" class="neu-btn mobile-nav-btn w-full h-12 text-lg">Products</button>
                 <button onclick="router.navigate('about-us'); toggleMobileMenu()" class="neu-btn mobile-nav-btn w-full h-12 text-lg">About Us</button>
-                <button onclick="router.navigate('contact-us'); toggleMobileMenu()" class="neu-btn mobile-nav-btn w-full h-12 text-lg">Contact Us</button>
+                <button onclick="goToContact(); toggleMobileMenu()" class="neu-btn mobile-nav-btn w-full h-12 text-lg">Contact Us</button>
             </div>
             
             <div class="mt-auto text-center text-sm text-gray-400">
@@ -279,7 +279,7 @@
                     <h3 class="font-bold text-neu-text mb-2">Quick Links</h3>
                     <a href="#" onclick="event.preventDefault(); router.navigate('products')" class="text-gray-500 hover:text-neu-accent transition">Products</a>
                     <a href="#" onclick="event.preventDefault(); router.navigate('about-us')" class="text-gray-500 hover:text-neu-accent transition">About Us</a>
-                    <a href="#" onclick="event.preventDefault(); router.navigate('contact-us')" class="text-gray-500 hover:text-neu-accent transition">Contact Us</a>
+                    <a href="#" onclick="event.preventDefault(); goToContact()" class="text-gray-500 hover:text-neu-accent transition">Contact Us</a>
                 </div>
 
                 <!-- Contact -->
@@ -319,7 +319,7 @@
                         <p id="modal-desc" class="text-gray-500 leading-relaxed mb-6">
                             Detailed description goes here.
                         </p>
-                        <button class="neu-btn w-full py-3">Add to Inquiry</button>
+                        <button onclick="addToInquiry()" class="neu-btn w-full py-3">Add to Inquiry</button>
                     </div>
                 </div>
             </div>
@@ -870,7 +870,7 @@
                         <button onclick="router.navigate('products')" class="neu-btn px-8 py-4 text-lg bg-neu-base hover:text-neu-accent">
                             Explore Products
                         </button>
-                        <button onclick="router.navigate('contact-us')" class="neu-btn neu-btn-secondary px-8 py-4 text-lg">
+                        <button onclick="goToContact()" class="neu-btn neu-btn-secondary px-8 py-4 text-lg">
                             Contact Us
                         </button>
                     </div>
@@ -993,7 +993,7 @@
                         <p class="text-gray-600 mb-8">Upgrade your car care routine with trusted, professional-grade products.</p>
                         <div class="flex flex-col gap-4 items-center justify-center">
                             <button onclick="router.navigate('products')" class="neu-btn px-10 py-3 w-64">Browse Products</button>
-                            <button onclick="router.navigate('contact-us')" class="neu-btn neu-btn-secondary px-10 py-3 w-64">Contact Us</button>
+                            <button onclick="goToContact()" class="neu-btn neu-btn-secondary px-10 py-3 w-64">Contact Us</button>
                         </div>
                     </div>
                 </section>
@@ -1147,7 +1147,7 @@
                                 <input type="text" placeholder="Your Name" class="neu-input" required>
                                 <input type="email" placeholder="Email Address" class="neu-input" required>
                                 <input type="tel" placeholder="Mobile Number" class="neu-input" required>
-                                <textarea rows="5" placeholder="Your Message" class="neu-input"></textarea>
+                                <textarea id="contact-message" rows="5" placeholder="Your Message" class="neu-input">${pendingInquiryMessage || ''}</textarea>
                                 <button type="submit" class="neu-btn w-full py-3 text-lg">Submit</button>
                             </form>
                         </div>
@@ -1199,6 +1199,9 @@
             // Helper to add 'active' classes or similar if needed logic arises
         }
 
+        let currentProductForInquiry = null;
+        let pendingInquiryMessage = '';
+
         // --- Modal Logic ---
         function openProductModal(productId) {
             // 1. Find the product object from the data
@@ -1213,11 +1216,14 @@
 
             if (!product) return; // Safety check
 
-            // 2. Populate basic fields
+            // 2. Remember this product for inquiry
+            currentProductForInquiry = product;
+
+            // 3. Populate basic fields
             document.getElementById('modal-title').innerText = product.name;
             document.getElementById('modal-price').innerText = product.price;
             
-            // 3. Populate Description with Text AND Bullets
+            // 4. Populate Description with Text AND Bullets
             const descContainer = document.getElementById('modal-desc');
             let descHTML = `<p class="mb-4">${product.desc.text}</p>`;
             
@@ -1230,7 +1236,7 @@
             }
             descContainer.innerHTML = descHTML;
 
-            // 4. Handle Image
+            // 5. Handle Image
             const imgEl = document.getElementById('modal-img');
             const iconEl = document.getElementById('modal-icon');
 
@@ -1248,6 +1254,24 @@
 
         function closeProductModal() {
             document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function addToInquiry() {
+            if (!currentProductForInquiry) return;
+
+            pendingInquiryMessage = `Hello, I would like to inquire about the product "${currentProductForInquiry.name}". Please share more details such as pricing and availability.`;
+
+            closeProductModal();
+            goToContactFromInquiry();
+        }
+
+        function goToContactFromInquiry() {
+            router.navigate('contact-us');
+        }
+
+        function goToContact() {
+            pendingInquiryMessage = '';
+            router.navigate('contact-us');
         }
 
         // --- Init ---
